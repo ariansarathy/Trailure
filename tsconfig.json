@@ -13,6 +13,9 @@
     "noUnusedParameters": false,
     "skipLibCheck": true,
     "allowJs": true,
+    "baseURl": true,
+    "allowJs": false,
+    "allowJs": true,
     "noUnusedLocals": false,
     "strictNullChecks": false
   }
