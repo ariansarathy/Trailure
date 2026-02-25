@@ -43,6 +43,7 @@ export default {
           700: "#6d6d3b",
           800: "#484827",
           900: "#242414",
+          1000: "#45378",
         },
         primary: {
           DEFAULT: "hsl(var(--primary))",
@@ -65,6 +66,9 @@ export default {
           foreground: "hsl(var(--accent-foreground))",
         },
         popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+          popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
         },
