@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Explore — Trailure</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sand: #F5EFE0;
+    --terracotta: #C8573A;
+    --deep: #1A1208;
+    --olive: #6B7A3A;
+    --warm: #E8C89A;
+    --mist: #D4C9B8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--sand);
+    color: var(--deep);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Nav */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 48px;
+    background: rgba(245,239,224,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(212,201,184,0.4);
+  }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--deep);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+  }
+  .logo span { color: var(--terracotta); }
+  .nav-back {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.85rem; font-weight: 500;
+    color: rgba(26,18,8,0.6);
+    text-decoration: none;
+    transition: color 0.2s, gap 0.2s;
+  }
+  .nav-back:hover { color: var(--deep); gap: 12px; }
+
+  /* Hero search area */
+  .search-hero {
+    padding: 190px 48px 60px;
+    text-align: center;
+    background: radial-gradient(ellipse at 50% 0%, rgba(200,87,58,0.08) 0%, transparent 60%);
+  }
+
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 0.75rem; font-weight: 500; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--terracotta);
+    margin-bottom: 20px;
+  }
+  .hero-eyebrow::before, .hero-eyebrow::after {
+    content: ''; width: 20px; height: 1px; background: currentColor;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 4vw, 3.6rem);
+    font-weight: 900; line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: 12px;
+  }
+  h1 em { color: var(--terracotta); font-style: italic; }
+
+  .hero-sub {
+    font-size: 1rem; color: rgba(26,18,8,0.55);
+    font-weight: 300; margin-bottom: 40px; line-height: 1.6;
+  }
+
+  /* Search box */
+  .search-wrap {
+    max-width: 680px; margin: 0 auto;
+    position: relative;
+  }
+
+  .search-box {
+    display: flex; align-items: center;
+    background: white;
+    border-radius: 100px;
+    border: 2px solid var(--mist);
+    padding: 8px 8px 8px 28px;
+    box-shadow: 0 8px 40px rgba(26,18,8,0.08);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .search-box:focus-within {
+    border-color: var(--terracotta);
+    box-shadow: 0 8px 40px rgba(200,87,58,0.15);
+  }
+
+  .search-icon { font-size: 1.1rem; margin-right: 12px; flex-shrink: 0; }
+
+  .search-input {
+    flex: 1; border: none; outline: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem; font-weight: 400;
+    background: transparent; color: var(--deep);
+    padding: 6px 0;
+  }
+  .search-input::placeholder { color: rgba(26,18,8,0.35); }
+
+  .search-btn {
+    background: var(--terracotta); color: white;
+    border: none; border-radius: 100px;
+    padding: 14px 28px; font-size: 0.9rem; font-weight: 500;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+    transition: background 0.2s, transform 0.15s;
+    flex-shrink: 0;
+  }
+  .search-btn:hover { background: #b34a2e; transform: scale(1.02); }
+  .search-btn:disabled { background: var(--mist); cursor: not-allowed; transform: none; }
+
+  /* Quick suggestions */
+  .quick-tags {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    justify-content: center; margin-top: 20px;
+  }
+  .quick-tag {
+    background: white; border: 1.5px solid var(--mist);
+    border-radius: 100px; padding: 8px 16px;
+    font-size: 0.82rem; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+    color: var(--deep);
+  }
+  .quick-tag:hover { border-color: var(--terracotta); color: var(--terracotta); background: rgba(200,87,58,0.04); }
+
+  /* Main content area */
+  .content-area {
+    max-width: 1100px; margin: 0 auto;
+    padding: 0 48px 80px;
+  }
+
+  /* Loading state */
+  .loading {
+    text-align: center; padding: 80px 0; display: none;
+  }
+  .loading.active { display: block; }
+
+  .spinner {
+    width: 48px; height: 48px;
+    border: 3px solid var(--mist);
+    border-top-color: var(--terracotta);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 20px;
+  }
+
+  .loading-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem; font-weight: 700;
+    color: var(--deep); margin-bottom: 6px;
+  }
+  .loading-sub { font-size: 0.85rem; color: rgba(26,18,8,0.5); }
+
+  /* Results header */
+  .results-header {
+    display: flex; align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--mist);
+    display: none;
+  }
+  .results-header.active { display: flex; }
+
+  .results-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem; font-weight: 900;
+    letter-spacing: -0.02em;
+  }
+  .results-title em { color: var(--terracotta); font-style: italic; }
+
+  .results-count {
+    font-size: 0.8rem; color: rgba(26,18,8,0.45);
+    font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+  }
+
+  /* Breadcrumb trail */
+  .breadcrumb {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 24px; font-size: 0.8rem;
+    color: rgba(26,18,8,0.45); flex-wrap: wrap;
+    display: none;
+  }
+  .breadcrumb.active { display: flex; }
+  .breadcrumb-item { cursor: pointer; transition: color 0.2s; }
+  .breadcrumb-item:hover { color: var(--terracotta); }
+  .breadcrumb-item.current { color: var(--deep); font-weight: 500; }
+  .breadcrumb-sep { opacity: 0.4; }
+
+  /* Category tabs */
+  .category-tabs {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 32px; display: none;
+  }
+  .category-tabs.active { display: flex; }
+  .cat-tab {
+    padding: 8px 18px; border-radius: 100px;
+    border: 1.5px solid var(--mist);
+    font-size: 0.82rem; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+    background: white; color: rgba(26,18,8,0.6);
+  }
+  .cat-tab:hover, .cat-tab.active {
+    border-color: var(--terracotta); color: var(--terracotta);
+    background: rgba(200,87,58,0.05);
+  }
+
+  /* Experience cards grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .exp-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1.5px solid rgba(212,201,184,0.5);
+    cursor: pointer;
+    transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+    animation: cardIn 0.4s ease both;
+  }
+  .exp-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 50px rgba(26,18,8,0.1);
+    border-color: var(--terracotta);
+  }
+
+  .card-emoji-header {
+    height: 100px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3rem;
+    position: relative;
+  }
+
+  .card-badge-type {
+    position: absolute; top: 12px; right: 12px;
+    background: rgba(26,18,8,0.7); color: white;
+    font-size: 0.65rem; font-weight: 500;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 100px;
+  }
+
+  .card-body { padding: 20px 22px 22px; }
+
+  .card-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem; font-weight: 700;
+    line-height: 1.2;
+  }
+  .card-rating {
+    display: flex; align-items: center; gap: 3px;
+    font-size: 0.78rem; font-weight: 500;
+    color: var(--terracotta); white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .card-location {
+    font-size: 0.78rem; color: rgba(26,18,8,0.45);
+    font-weight: 500; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  .card-desc {
+    font-size: 0.85rem; line-height: 1.6;
+    color: rgba(26,18,8,0.6); font-weight: 300;
+    margin-bottom: 16px;
+  }
+
+  .card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .card-tag {
+    background: rgba(107,122,58,0.08);
+    color: var(--olive); font-size: 0.7rem; font-weight: 500;
+    padding: 4px 10px; border-radius: 100px;
+  }
+
+  .card-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 14px; border-top: 1px solid rgba(212,201,184,0.4);
+  }
+  .card-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem; font-weight: 700;
+    color: var(--deep);
+  }
+  .card-price span { font-family: 'DM Sans', sans-serif; font-size: 0.75rem; font-weight: 400; color: rgba(26,18,8,0.4); }
+
+  .card-btn {
+    background: var(--terracotta); color: white;
+    border: none; border-radius: 100px;
+    padding: 8px 18px; font-size: 0.78rem; font-weight: 500;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: background 0.2s;
+  }
+  .card-btn:hover { background: #b34a2e; }
+
+  /* Detail panel */
+  .detail-overlay {
+    position: fixed; inset: 0;
+    background: rgba(26,18,8,0.5);
+    z-index: 200; display: none;
+    align-items: flex-end; justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .detail-overlay.active { display: flex; }
+
+  .detail-panel {
+    background: var(--sand);
+    width: 100%; max-width: 680px;
+    border-radius: 24px 24px 0 0;
+    padding: 40px 40px 56px;
+    max-height: 85vh; overflow-y: auto;
+    animation: slideUp 0.35s ease;
+  }
+
+  .detail-close {
+    position: absolute; top: 20px; right: 24px;
+    width: 36px; height: 36px;
+    background: white; border: none; border-radius: 50%;
+    font-size: 1.1rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 12px rgba(26,18,8,0.1);
+  }
+
+  .detail-emoji { font-size: 3.5rem; margin-bottom: 16px; display: block; }
+  .detail-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem; font-weight: 900; margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+  .detail-loc { font-size: 0.85rem; color: rgba(26,18,8,0.5); margin-bottom: 20px; }
+  .detail-desc { font-size: 0.95rem; line-height: 1.75; color: rgba(26,18,8,0.7); margin-bottom: 24px; }
+
+  .detail-section-title {
+    font-size: 0.72rem; font-weight: 500; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--terracotta);
+    margin-bottom: 14px;
+  }
+
+  .detail-options {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-bottom: 28px;
+  }
+  .detail-option {
+    background: white; border: 2px solid var(--mist);
+    border-radius: 14px; padding: 14px 16px;
+    cursor: pointer; transition: all 0.2s;
+    font-size: 0.88rem; font-weight: 400;
+    color: var(--deep);
+  }
+  .detail-option:hover, .detail-option.selected {
+    border-color: var(--terracotta);
+    background: rgba(200,87,58,0.04);
+    color: var(--terracotta); font-weight: 500;
+  }
+  .detail-option strong { display: block; font-weight: 600; margin-bottom: 2px; font-size: 0.9rem; }
+  .detail-option span { font-size: 0.78rem; color: rgba(26,18,8,0.45); }
+  .detail-option.selected span { color: rgba(200,87,58,0.6); }
+
+  .detail-refine-btn {
+    width: 100%; background: var(--terracotta); color: white;
+    border: none; border-radius: 100px;
+    padding: 16px; font-size: 0.95rem; font-weight: 500;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: background 0.2s, transform 0.15s;
+    margin-top: 8px;
+  }
+  .detail-refine-btn:hover { background: #b34a2e; transform: scale(1.01); }
+  .detail-refine-btn:disabled { background: var(--mist); cursor: not-allowed; transform: none; }
+
+  /* Refined results in panel */
+  .refined-results { margin-top: 28px; }
+  .refined-item {
+    background: white; border-radius: 14px;
+    padding: 16px 18px; margin-bottom: 12px;
+    border: 1.5px solid rgba(212,201,184,0.5);
+    animation: cardIn 0.3s ease both;
+  }
+  .refined-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem; font-weight: 700; margin-bottom: 4px;
+  }
+  .refined-desc { font-size: 0.82rem; line-height: 1.6; color: rgba(26,18,8,0.55); }
+  .refined-meta {
+    display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;
+  }
+  .refined-badge {
+    font-size: 0.7rem; padding: 3px 10px; border-radius: 100px;
+    font-weight: 500;
+  }
+  .badge-price { background: rgba(107,122,58,0.1); color: var(--olive); }
+  .badge-dur { background: rgba(200,87,58,0.08); color: var(--terracotta); }
+
+  /* Empty / welcome state */
+  .welcome-state {
+    text-align: center; padding: 60px 0;
+  }
+  .welcome-emoji { font-size: 4rem; margin-bottom: 16px; }
+  .welcome-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem; font-weight: 700; margin-bottom: 8px;
+  }
+  .welcome-sub { font-size: 0.9rem; color: rgba(26,18,8,0.5); }
+
+  /* Animations */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slideUp {
+    from { transform: translateY(60px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  /* API Key Banner */
+  .api-banner {
+    background: var(--deep);
+    color: var(--sand);
+    padding: 12px 48px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: fixed;
+    top: 73px; left: 0; right: 0;
+    z-index: 99;
+    border-bottom: 1px solid rgba(245,239,224,0.08);
+    flex-wrap: wrap;
+    transition: transform 0.3s ease;
+  }
+  .api-banner.hidden { transform: translateY(-200%); }
+  .api-banner-label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0.7;
+  }
+  .api-banner-label span { color: var(--terracotta); font-weight: 700; }
+  .api-key-input {
+    flex: 1; min-width: 220px;
+    background: rgba(255,255,255,0.07);
+    border: 1.5px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    color: var(--sand);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .api-key-input::placeholder { opacity: 0.35; }
+  .api-key-input:focus { border-color: var(--terracotta); }
+  .api-save-btn {
+    background: var(--terracotta);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .api-save-btn:hover { background: #b34a2e; }
+  .api-link {
+    font-size: 0.75rem;
+    color: rgba(245,239,224,0.4);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .api-link:hover { color: rgba(245,239,224,0.8); }
+  .api-success {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: #7DC47A;
+    font-weight: 500;
+  }
+  .api-success.show { display: flex; }
+  .api-change-btn {
+    font-size: 0.75rem;
+    color: rgba(245,239,224,0.4);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    text-decoration: underline;
+  }
+  .api-change-btn:hover { color: rgba(245,239,224,0.8); }
+
+  /* Custom cursor */
+  body { cursor: none; }
+  .cursor {
+    width: 10px; height: 10px;
+    background: var(--terracotta);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s ease;
+    mix-blend-mode: multiply;
+  }
+  .cursor-follower {
+    width: 32px; height: 32px;
+    border: 1.5px solid var(--terracotta);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    transition: all 0.2s ease;
+    mix-blend-mode: multiply;
+  }
+
+  @media (max-width: 680px) {
+    nav { padding: 20px 20px; }
+    .search-hero { padding: 110px 20px 48px; }
+    .content-area { padding: 0 20px 80px; }
+    .detail-panel { padding: 28px 20px 48px; }
+    .detail-options { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-follower" id="follower"></div>
+
+<nav>
+  <a href="trailure.html" class="logo">Trail<span>ure</span></a>
+  <a href="trailure.html" class="nav-back">
+    ← Back to Home
+  </a>
+</nav>
+
+<!-- API Key Banner -->
+<div class="api-banner" id="apiBanner">
+  <div class="api-banner-label">🔑 <span>Anthropic API Key</span> required to power AI search</div>
+  <input type="password" class="api-key-input" id="apiKeyInput" placeholder="sk-ant-api03-..." />
+  <button class="api-save-btn" onclick="saveApiKey()">Save Key</button>
+  <a href="https://console.anthropic.com/settings/keys" target="_blank" class="api-link">Get a key →</a>
+  <div class="api-success" id="apiSuccess">
+    ✅ Key saved — start searching!
+    <button class="api-change-btn" onclick="changeKey()">Change</button>
+  </div>
+</div>
+
+<!-- Search hero -->
+<div class="search-hero">
+  <div class="hero-eyebrow">AI Travel Discovery</div>
+  <h1>Where do you want to <em>explore?</em></h1>
+  <p class="hero-sub">Type any destination — country, city, region, or even a vibe — and we'll uncover tailored experiences just for you.</p>
+
+  <div class="search-wrap">
+    <div class="search-box">
+      <span class="search-icon">🌍</span>
+      <input type="text" class="search-input" id="searchInput" placeholder="e.g. Africa, Japan, Patagonia, beach getaway..." />
+      <button class="search-btn" id="searchBtn" onclick="startSearch()">Discover →</button>
+    </div>
+    <div class="quick-tags" id="quickTags">
+      <div class="quick-tag" onclick="quickSearch('Africa')">🌍 Africa</div>
+      <div class="quick-tag" onclick="quickSearch('Japan')">🗾 Japan</div>
+      <div class="quick-tag" onclick="quickSearch('Patagonia')">🏔️ Patagonia</div>
+      <div class="quick-tag" onclick="quickSearch('Amalfi Coast')">🌊 Amalfi Coast</div>
+      <div class="quick-tag" onclick="quickSearch('Southeast Asia')">🏝️ SE Asia</div>
+      <div class="quick-tag" onclick="quickSearch('Iceland')">❄️ Iceland</div>
+    </div>
+  </div>
+</div>
+
+<!-- Main content -->
+<div class="content-area">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb" id="breadcrumb"></div>
+
+  <!-- Category tabs -->
+  <div class="category-tabs" id="categoryTabs"></div>
+
+  <!-- Loading -->
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Discovering experiences...</div>
+    <div class="loading-sub" id="loadingSubText">Curating hidden gems and local insights just for you</div>
+  </div>
+
+  <!-- Results header -->
+  <div class="results-header" id="resultsHeader">
+    <div class="results-title" id="resultsTitle"></div>
+    <div class="results-count" id="resultsCount"></div>
+  </div>
+
+  <!-- Cards grid -->
+  <div class="cards-grid" id="cardsGrid"></div>
+
+  <!-- Welcome state -->
+  <div class="welcome-state" id="welcomeState">
+    <div class="welcome-emoji">✈️</div>
+    <div class="welcome-text">Your journey begins with a destination</div>
+    <div class="welcome-sub">Search above or pick a quick suggestion to get started</div>
+  </div>
+</div>
+
+<!-- Detail overlay -->
+<div class="detail-overlay" id="detailOverlay" onclick="closeDetail(event)">
+  <div class="detail-panel" id="detailPanel">
+    <button class="detail-close" onclick="closeDetail()">✕</button>
+    <span class="detail-emoji" id="detailEmoji"></span>
+    <div class="detail-title" id="detailTitle"></div>
+    <div class="detail-loc" id="detailLoc"></div>
+    <div class="detail-desc" id="detailDesc"></div>
+
+    <div class="detail-section-title">Tailor your experience</div>
+    <div class="detail-options" id="detailOptions"></div>
+    <button class="detail-refine-btn" id="refineBtn" onclick="refineExperience()">Find Perfect Options →</button>
+
+    <div class="refined-results" id="refinedResults"></div>
+  </div>
+</div>
+
+<script>
+  let currentDestination = '';
+  let currentCard = null;
+  let selectedOption = null;
+  let breadcrumbTrail = [];
+  let allCards = [];
+  let activeCategory = 'all';
+
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const follower = document.getElementById('follower');
+  let mx = 0, my = 0, fx = 0, fy = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx - 5 + 'px';
+    cursor.style.top = my - 5 + 'px';
+  });
+
+  function animateFollower() {
+    fx += (mx - fx - 16) * 0.12;
+    fy += (my - fy - 16) * 0.12;
+    follower.style.left = fx + 'px';
+    follower.style.top = fy + 'px';
+    requestAnimationFrame(animateFollower);
+  }
+  animateFollower();
+
+  // Quick search shortcuts
+  function quickSearch(dest) {
+    document.getElementById('searchInput').value = dest;
+    startSearch();
+  }
+
+  // Enter key
+  document.getElementById('searchInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') startSearch();
+  });
+
+  async function startSearch() {
+    const query = document.getElementById('searchInput').value.trim();
+    if (!query) return;
+
+    currentDestination = query;
+    breadcrumbTrail = [query];
+    activeCategory = 'all';
+    selectedOption = null;
+
+    showLoading(`Exploring ${query}...`, 'Curating hidden gems and local insights just for you');
+    hideWelcome(); hideResults(); hideCategories(); hideBreadcrumb();
+
+    try {
+      const data = await callClaude(buildSearchPrompt(query));
+      const parsed = parseJSON(data);
+      renderResults(parsed, query);
+    } catch(e) {
+      showError(e.message);
+    }
+  }
+
+  function buildSearchPrompt(destination) {
+    return `You are Trailure's AI travel curator. Generate 9 captivating, diverse travel experiences for: "${destination}".
+
+Return ONLY a valid JSON object in this exact format (no markdown, no extra text):
+{
+  "destination": "Display name for ${destination}",
+  "tagline": "A poetic one-line description of this destination",
+  "categories": ["Adventure", "Culture", "Food & Drink", "Nature", "Wellness", "Hidden Gems"],
+  "experiences": [
+    {
+      "id": 1,
+      "emoji": "🏔️",
+      "title": "Experience name",
+      "location": "Specific place within ${destination}",
+      "category": "Adventure",
+      "type": "Outdoor",
+      "description": "2 sentence vivid description of why this is unmissable",
+      "tags": ["tag1", "tag2", "tag3"],
+      "rating": 4.8,
+      "price": "$120",
+      "priceNote": "per person",
+      "tailorOptions": [
+        {"label": "Solo Explorer", "desc": "Best for solo travelers"},
+        {"label": "Couple Retreat", "desc": "Perfect for two"},
+        {"label": "Family Adventure", "desc": "Great with kids"},
+        {"label": "Group Trip", "desc": "Ideal for groups 4+"}
+      ]
+    }
+  ]
+}
+
+Make experiences vivid, specific, authentic. Include a mix of: adventure, hidden gems, local food, cultural sites, nature, wellness. Vary prices ($30-$500). Make tailorOptions relevant to each experience type.`;
+  }
+
+  function buildRefinePrompt(experience, option) {
+    return `You are Trailure's AI travel curator. A traveler selected "${experience.title}" in "${experience.location}" and wants "${option}" options.
+
+Return ONLY a valid JSON object (no markdown):
+{
+  "results": [
+    {
+      "title": "Specific option name",
+      "description": "2 sentence vivid description tailored for ${option} travelers",
+      "price": "$XX",
+      "duration": "X days / X hours",
+      "highlight": "The one unmissable thing about this option"
+    }
+  ]
+}
+
+Generate 4 specific, actionable itinerary options for "${option}" travelers wanting to do "${experience.title}". Make each option distinctly different (budget vs premium, short vs extended, etc.).`;
+  }
+
+  // API Key management
+  let apiKey = '';
+
+  function saveApiKey() {
+    const input = document.getElementById('apiKeyInput').value.trim();
+    if (!input.startsWith('sk-')) {
+      document.getElementById('apiKeyInput').style.borderColor = 'var(--terracotta)';
+      document.getElementById('apiKeyInput').placeholder = 'Must start with sk-ant-api...';
+      return;
+    }
+    apiKey = input;
+    document.getElementById('apiKeyInput').style.display = 'none';
+    document.querySelector('.api-save-btn').style.display = 'none';
+    document.querySelector('.api-link').style.display = 'none';
+    document.getElementById('apiSuccess').classList.add('show');
+  }
+
+  function changeKey() {
+    apiKey = '';
+    document.getElementById('apiKeyInput').style.display = '';
+    document.querySelector('.api-save-btn').style.display = '';
+    document.querySelector('.api-link').style.display = '';
+    document.getElementById('apiKeyInput').value = '';
+    document.getElementById('apiSuccess').classList.remove('show');
+  }
+
+  async function callClaude(prompt) {
+    if (!apiKey) {
+      document.getElementById('apiKeyInput').focus();
+      throw new Error('No API key');
+    }
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true"
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err?.error?.message || `HTTP ${response.status}`);
+    }
+    const data = await response.json();
+    return data.content[0].text;
+  }
+
+  function parseJSON(text) {
+    const clean = text.replace(/```json|```/g, '').trim();
+    return JSON.parse(clean);
+  }
+
+  function renderResults(data, query) {
+    hideLoading();
+    allCards = data.experiences || [];
+
+    // Breadcrumb
+    showBreadcrumb();
+
+    // Category tabs
+    const categories = ['All', ...(data.categories || [])];
+    renderCategories(categories, allCards);
+
+    // Header
+    const header = document.getElementById('resultsHeader');
+    header.classList.add('active');
+    document.getElementById('resultsTitle').innerHTML = `Exploring <em>${data.destination}</em>`;
+    document.getElementById('resultsCount').textContent = `${allCards.length} experiences`;
+
+    renderCards(allCards);
+  }
+
+  function renderCategories(categories, cards) {
+    const tabs = document.getElementById('categoryTabs');
+    tabs.innerHTML = '';
+    tabs.classList.add('active');
+
+    categories.forEach(cat => {
+      const tab = document.createElement('div');
+      tab.className = 'cat-tab' + (cat === 'All' ? ' active' : '');
+      const count = cat === 'All' ? cards.length : cards.filter(c => c.category === cat).length;
+      tab.textContent = `${cat} (${count})`;
+      tab.onclick = () => filterCategory(cat, categories);
+      tabs.appendChild(tab);
+    });
+  }
+
+  function filterCategory(cat, categories) {
+    activeCategory = cat;
+    document.querySelectorAll('.cat-tab').forEach((t, i) => {
+      t.classList.toggle('active', (cat === 'All' && i === 0) || t.textContent.startsWith(cat));
+    });
+    const filtered = cat === 'All' ? allCards : allCards.filter(c => c.category === cat);
+    document.getElementById('resultsCount').textContent = `${filtered.length} experiences`;
+    renderCards(filtered);
+  }
+
+  function renderCards(experiences) {
+    const grid = document.getElementById('cardsGrid');
+    grid.innerHTML = '';
+
+    experiences.forEach((exp, idx) => {
+      const bgColors = [
+        'linear-gradient(135deg, #FFF5EC, #FFECD8)',
+        'linear-gradient(135deg, #EBF5E8, #D9F0D2)',
+        'linear-gradient(135deg, #EBF0F5, #D6E8F5)',
+        'linear-gradient(135deg, #F5EBEE, #F5D6DE)',
+        'linear-gradient(135deg, #F5F0EB, #EDE0D4)',
+        'linear-gradient(135deg, #EEF5EB, #DFF5D6)',
+      ];
+
+      const card = document.createElement('div');
+      card.className = 'exp-card';
+      card.style.animationDelay = `${idx * 0.05}s`;
+      card.innerHTML = `
+        <div class="card-emoji-header" style="background: ${bgColors[idx % bgColors.length]}">
+          ${exp.emoji || '🌍'}
+          <span class="card-badge-type">${exp.type || exp.category}</span>
+        </div>
+        <div class="card-body">
+          <div class="card-title-row">
+            <div class="card-title">${exp.title}</div>
+            <div class="card-rating">⭐ ${exp.rating || '4.8'}</div>
+          </div>
+          <div class="card-location">📍 ${exp.location}</div>
+          <div class="card-desc">${exp.description}</div>
+          <div class="card-tags">${(exp.tags || []).map(t => `<span class="card-tag">${t}</span>`).join('')}</div>
+          <div class="card-footer">
+            <div class="card-price">${exp.price} <span>/ ${exp.priceNote || 'person'}</span></div>
+            <button class="card-btn" onclick="openDetail(${exp.id})">Explore →</button>
+          </div>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function openDetail(id) {
+    const exp = allCards.find(e => e.id === id);
+    if (!exp) return;
+    currentCard = exp;
+    selectedOption = null;
+
+    document.getElementById('detailEmoji').textContent = exp.emoji || '🌍';
+    document.getElementById('detailTitle').textContent = exp.title;
+    document.getElementById('detailLoc').textContent = `📍 ${exp.location} · ${exp.category}`;
+    document.getElementById('detailDesc').textContent = exp.description;
+    document.getElementById('refinedResults').innerHTML = '';
+    document.getElementById('refineBtn').disabled = true;
+    document.getElementById('refineBtn').textContent = 'Select your travel style above →';
+
+    // Tailor options
+    const opts = document.getElementById('detailOptions');
+    opts.innerHTML = '';
+    (exp.tailorOptions || []).forEach(opt => {
+      const el = document.createElement('div');
+      el.className = 'detail-option';
+      el.innerHTML = `<strong>${opt.label}</strong><span>${opt.desc}</span>`;
+      el.onclick = () => selectOption(el, opt.label);
+      opts.appendChild(el);
+    });
+
+    document.getElementById('detailOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function selectOption(el, label) {
+    document.querySelectorAll('.detail-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedOption = label;
+    const btn = document.getElementById('refineBtn');
+    btn.disabled = false;
+    btn.textContent = `Find Perfect Options for ${label} →`;
+  }
+
+  async function refineExperience() {
+    if (!selectedOption || !currentCard) return;
+
+    const btn = document.getElementById('refineBtn');
+    btn.disabled = true;
+    btn.textContent = 'Finding perfect options...';
+
+    const refined = document.getElementById('refinedResults');
+    refined.innerHTML = '<div style="text-align:center;padding:24px 0"><div class="spinner" style="margin:0 auto"></div></div>';
+
+    try {
+      const data = await callClaude(buildRefinePrompt(currentCard, selectedOption));
+      const parsed = parseJSON(data);
+      renderRefined(parsed.results || []);
+
+      // Update breadcrumb
+      breadcrumbTrail = [currentDestination, currentCard.title, selectedOption];
+      showBreadcrumb();
+    } catch(e) {
+      refined.innerHTML = '<p style="color:rgba(26,18,8,0.5);text-align:center;padding:20px">Unable to load options. Please try again.</p>';
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Refine Again →';
+  }
+
+  function renderRefined(results) {
+    const container = document.getElementById('refinedResults');
+    container.innerHTML = `<div class="detail-section-title" style="margin-top:0">Your Tailored Options</div>`;
+
+    results.forEach((r, i) => {
+      const el = document.createElement('div');
+      el.className = 'refined-item';
+      el.style.animationDelay = `${i * 0.08}s`;
+      el.innerHTML = `
+        <div class="refined-title">${r.title}</div>
+        <div class="refined-desc">${r.description}</div>
+        ${r.highlight ? `<div style="font-size:0.8rem;color:var(--terracotta);margin-top:6px;font-weight:500">✨ ${r.highlight}</div>` : ''}
+        <div class="refined-meta">
+          <span class="refined-badge badge-price">${r.price}</span>
+          <span class="refined-badge badge-dur">⏱ ${r.duration}</span>
+        </div>
+      `;
+      container.appendChild(el);
+    });
+  }
+
+  function closeDetail(e) {
+    if (e && e.target !== document.getElementById('detailOverlay')) return;
+    document.getElementById('detailOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+    currentCard = null; selectedOption = null;
+  }
+
+  // Breadcrumb
+  function showBreadcrumb() {
+    const bc = document.getElementById('breadcrumb');
+    bc.classList.add('active');
+    bc.innerHTML = breadcrumbTrail.map((item, i) => {
+      const isCurrent = i === breadcrumbTrail.length - 1;
+      return `<span class="breadcrumb-item ${isCurrent ? 'current' : ''}" ${!isCurrent ? `onclick="backTo(${i})"` : ''}>${item}</span>${!isCurrent ? '<span class="breadcrumb-sep">›</span>' : ''}`;
+    }).join('');
+  }
+
+  function hideBreadcrumb() { document.getElementById('breadcrumb').classList.remove('active'); }
+
+  function backTo(idx) {
+    if (idx === 0) startSearch();
+  }
+
+  // UI helpers
+  function showLoading(text, sub) {
+    document.getElementById('loading').classList.add('active');
+    document.getElementById('loadingText').textContent = text;
+    document.getElementById('loadingSubText').textContent = sub;
+  }
+  function hideLoading() { document.getElementById('loading').classList.remove('active'); }
+  function hideWelcome() { document.getElementById('welcomeState').style.display = 'none'; }
+  function hideResults() {
+    document.getElementById('resultsHeader').classList.remove('active');
+    document.getElementById('cardsGrid').innerHTML = '';
+  }
+  function hideCategories() { document.getElementById('categoryTabs').classList.remove('active'); }
+
+  function showError(msg) {
+    hideLoading();
+    const isKeyError = !apiKey || (msg && (msg.includes('401') || msg.includes('api_key') || msg.includes('No API')));
+    document.getElementById('cardsGrid').innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:60px 0">
+        <div style="font-size:3rem;margin-bottom:16px">${isKeyError ? '🔑' : '😕'}</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;margin-bottom:8px">
+          ${isKeyError ? 'API key needed' : 'Couldn\'t load experiences'}
+        </div>
+        <div style="font-size:0.85rem;color:rgba(26,18,8,0.5)">
+          ${isKeyError ? 'Enter your Anthropic API key in the banner above to get started' : 'Please check your API key or try again in a moment'}
+        </div>
+      </div>`;
+    document.getElementById('resultsHeader').classList.add('active');
+  }
+</script>
+</body>
+</html>
