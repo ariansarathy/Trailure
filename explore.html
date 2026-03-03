@@ -328,6 +328,7 @@
   .detail-overlay.active { display: flex; }
 
   .detail-panel {
+    position: relative; /* FIX #3: Added positioning context for close button */
     background: var(--sand);
     width: 100%; max-width: 680px;
     border-radius: 24px 24px 0 0;
@@ -552,8 +553,9 @@
 <div class="cursor-follower" id="follower"></div>
 
 <nav>
-  <a href="trailure.html" class="logo">Trail<span>ure</span></a>
-  <a href="trailure.html" class="nav-back">
+  <!-- FIX #1: Changed trailure.html → index.html -->
+  <a href="index.html" class="logo">Trail<span>ure</span></a>
+  <a href="index.html" class="nav-back">
     ← Back to Home
   </a>
 </nav>
@@ -797,7 +799,7 @@ Generate 4 specific, actionable itinerary options for "${option}" travelers want
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
+        max_tokens: 4096, /* FIX #2: Increased from 1000 — 9 JSON experiences need more tokens */
         messages: [{ role: "user", content: prompt }]
       })
     });
@@ -984,8 +986,9 @@ Generate 4 specific, actionable itinerary options for "${option}" travelers want
     });
   }
 
+  /* FIX #4: Improved closeDetail to properly handle overlay vs panel clicks */
   function closeDetail(e) {
-    if (e && e.target !== document.getElementById('detailOverlay')) return;
+    if (e && e.target.closest('.detail-panel') && !e.target.closest('.detail-close')) return;
     document.getElementById('detailOverlay').classList.remove('active');
     document.body.style.overflow = '';
     currentCard = null; selectedOption = null;
